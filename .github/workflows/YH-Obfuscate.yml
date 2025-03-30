@@ -37,12 +37,12 @@ jobs:
             --compact true \
             --control-flow-flattening false \
             --dead-code-injection false \
-            --identifier-names-generator mangled \  # 修改为有效值
+            --identifier-names-generator mangled \
             --rename-globals false \
             --string-array false \
             --transform-object-keys false \
             --unicode-escape-sequence false
-        
+ 
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
