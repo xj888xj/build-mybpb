@@ -1,0 +1,73 @@
+name: Build Obfuscate BPB Panel youhua
+
+on:
+  push:
+    branches:
+      - main
+  schedule:
+        # Runs everyday at 1:00 AM
+        - cron: "0 1 * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "latest"
+
+      - name: Install dependencies
+        run: |
+          npm install -g javascript-obfuscator
+      - name: Clone BPB workjs
+        run: |
+          wget -O origin.js https://raw.githubusercontent.com/bia-pain-bache/BPB-Worker-Panel/refs/heads/main/build/unobfuscated-worker.js
+      - name: 混淆 BPB Worker JS
+        run: |
+          javascript-obfuscator origin.js --output _worker.js \
+          
+          # 启用代码压缩，去除多余的空白和注释
+          --compact true \
+          
+          # 禁用控制流扁平化，以减小文件大小
+          --control-flow-flattening false \
+          
+          # 禁用无效代码注入，以减小文件大小
+          --dead-code-injection false \
+          
+          # 使用默认的标识符名称生成器，避免增加文件大小
+          --identifier-names-generator default \
+          
+          # 禁用全局变量重命名，以减小文件大小
+          --rename-globals false \
+          
+          # 禁用字符串数组，避免增加文件大小
+          --string-array false \
+          
+          # 移除字符串数组编码选项
+          # --string-array-encoding 'rc4' \
+          
+          # 移除字符串数组阈值选项
+          # --string-array-threshold 1 \
+          
+          # 禁用对象键混淆，以减小文件大小
+          --transform-object-keys false \
+          
+          # 禁用 Unicode 转义序列，以减小文件大小
+          --unicode-escape-sequence false
+      
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          branch: main
+          commit_message: ':arrow_up: update latest bpb panel'
+          commit_author: 'github-actions[bot] <github-actions[bot]@users.noreply.github.com>'
+          push_options: '--set-upstream'
